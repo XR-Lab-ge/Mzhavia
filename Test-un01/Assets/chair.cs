@@ -6,9 +6,10 @@ public class chair : UdonSharpBehaviour
 {
     public VRC.SDK3.Components.VRCStation station;
 
-    public override void Interact()
+    // We create a custom public method for the UI
+    public void _SitInChair()
     {
-        Debug.Log("Interact fired");
+        Debug.Log("UI Button Clicked");
 
         if (station == null)
         {
@@ -16,15 +17,17 @@ public class chair : UdonSharpBehaviour
             return;
         }
 
-        var player = Networking.LocalPlayer;
+        VRCPlayerApi player = Networking.LocalPlayer;
 
-        if (player == null)
-        {
-            Debug.Log("No local player");
-            return;
-        }
+        if (player == null) return;
 
-        Debug.Log("Forcing station use");
+        // Forces the player into the station
         station.UseStation(player);
+    }
+
+    // Optional: Keep this if you want BOTH the button and the physical chair to work
+    public override void Interact()
+    {
+        _SitInChair();
     }
 }
