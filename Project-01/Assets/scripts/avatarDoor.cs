@@ -3,6 +3,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class avatarDoor : UdonSharpBehaviour
 {
     [Header("References")]
@@ -12,71 +13,108 @@ public class avatarDoor : UdonSharpBehaviour
 
     [Header("Settings")]
     public float closeDelay = 1.5f;
+
+    // hasAccess remains local; only the person clicking needs to pass the check
     public bool hasAccess = false;
 
-    private bool isOpen = false;
+    // This is the source of truth for the whole room
+    [UdonSynced] private bool _netIsOpen = false;
+
     private float timer = 0f;
     private bool isCounting = false;
 
-    // --- GATEKEEPER LOGIC ---
+    // --- ACCESS LOGIC (Local Only) ---
 
     public void TryOpenFromOutside()
     {
-        // NEW CHECK: Block entry if conductor says we are at 5/5 tickets
+        // 1. Check if the cinema is full
         if (conductor != null && conductor.IsCinemaFull())
         {
-            Debug.Log("Door: Cinema is FULL. Access blocked.");
+            Debug.Log("[Door] Cinema Full - Access Blocked.");
             return;
         }
 
+        // 2. Check if this specific player has access
         if (!hasAccess)
         {
-            Debug.Log("Door: Access denied.");
+            Debug.Log("[Door] No Access - Door remains shut.");
             return;
         }
 
-        OpenDoor();
+        // 3. If passed, tell the network to open the door
+        SendOpenRequest(true);
     }
 
     public void TryOpenFromInside()
     {
+        // Inside logic: Check if player still has a ticket
         if (conductor != null && conductor.hasTicketLocally)
         {
-            Debug.Log("Door: LOCKED! You still have a ticket.");
+            Debug.Log("[Door] Locked - You haven't used your ticket yet.");
             return;
         }
 
-        OpenDoor();
+        SendOpenRequest(true);
     }
-
-    // --- DOOR MECHANICS ---
 
     public void GrantAccess()
     {
         hasAccess = true;
     }
 
-    private void OpenDoor()
+    // --- NETWORKING CORE ---
+
+    private void SendOpenRequest(bool open)
     {
-        isOpen = true;
-        isCounting = true;
-        timer = 0f;
-        doorAnimator.SetBool(openParam, true);
+        // Take ownership so we can change the synced variable
+        if (!Networking.IsOwner(gameObject))
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+        }
+
+        _netIsOpen = open;
+
+        if (open)
+        {
+            isCounting = true;
+            timer = 0f;
+        }
+        else
+        {
+            isCounting = false;
+        }
+
+        // Update ourselves immediately
+        ApplyVisuals();
+
+        // Update everyone else
+        RequestSerialization();
     }
 
-    private void CloseDoor()
+    // This is called automatically on everyone's PC when the owner calls RequestSerialization
+    public override void OnDeserialization()
     {
-        isOpen = false;
-        isCounting = false;
-        doorAnimator.SetBool(openParam, false);
+        ApplyVisuals();
     }
 
-    void Update()
+    private void ApplyVisuals()
     {
-        if (isCounting)
+        if (doorAnimator != null)
+        {
+            doorAnimator.SetBool(openParam, _netIsOpen);
+        }
+    }
+
+    private void Update()
+    {
+        // Only the owner processes the countdown timer
+        if (isCounting && Networking.IsOwner(gameObject))
         {
             timer += Time.deltaTime;
-            if (timer >= closeDelay) CloseDoor();
+            if (timer >= closeDelay)
+            {
+                SendOpenRequest(false);
+            }
         }
     }
 }
