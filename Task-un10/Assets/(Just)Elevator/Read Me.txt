@@ -1,0 +1,58 @@
+Before you customize your elevator, here's some important info!
+
+Easy Setup
+	By default, all the parts of the elevator have an "easy setup" mode enabled.
+	To use "Easy Setup", click on the "Entrance Frame" (elevator door) object and press CTRL+D to duplicate it. Then place it 1 floor up.
+	That's the easy setup way!
+	Below is the explanation of why
+
+
+Elevator Doors
+	Each stop of the elevator must be parented under one "Exits" object.
+	Each elevator door has an "easy setup" script which sets their floor based on their order underneath the "Exits" object, you can toggle this off and set a floor manually if you want.
+		This "easy setup" script also passes the floor number information to the "call elevator" buttons.
+	Also on this object is the code for the floor display
+		This script updates the display whenever you're within the range set by the "sphere collider" component. This was done just in case for optimization, but you can expand or shrink that collider as you like.
+		You can also replace the sphere collider with any type of collider set to "trigger"
+	Elevator floors start counting at 1, even if you set your elevator to have basements.
+
+
+Auto Buttons
+	There are 14 auto buttons by default for (up to) 14 floors.
+		Their Udon Component is hidden 1 object inside of the button for animation reasons.
+	Using 3 (configurable) sets of numbers, they fill out in a grid based on how many floors you have. And remove any extras.
+	If you need more buttons, just copy and paste the buttons.
+	If you want to quickly make new buttons with different settings, you can delete all but 1 button, edit it, and duplicate it to make a new batch.
+		(I sometimes run into a "network ID" issue with this, this is fixable in the VRChat SDK but is annoying.)
+			At the top bar of unity, click "VRChat SDK" > Utilities > Network ID import and export > Regenerate
+			Warning, doing this means you have to reupload for quest, as this regenerates all network IDs, meaning all synced objects will be disconnected.
+
+
+Elevator Configuration
+	You can set the starting floor of the elevator on the "elevator" object, floors start counting at 1, regardless of how many basement floors you have set.
+	"Basement floors" are a cosmetic change to the floor display screen, they also change the text on the inside elevator buttons with "SetButtonText" left on.
+	You can set the speed of the elevator, though I personally recommend a speed of 1 or 1.5
+	"Pickup Time" is how long the elevator doors stay open, be aware that the hold door button and players walking into the closing door don't just add time, they reset the timer.
+		The animation time for the elevator opening should be added to this number.
+	"ElevatorMusic" and "ArrivedAtFloorSound" are ways of adding audio clips to your elevator without needing to use the animations of the elevator. It was possible to add sounds before, but it was very manual, and my previous 'example' in the prefab had been removed due to a bug and I forgot to add an alternative example.
+	
+
+
+Animations
+	To change the animation for the elevator, you can simply click on the elevator, open the animation window, and change the animation.
+		Just make sure that if you make your animator from scratch, the animations in the animator are labeled "Open" and "Close", and are not connected to anything.
+			Well, you can connect them to things if you're sure you know what you're doing.
+	To change the animation of the outer door, do the same but for "entrance frame"
+
+
+Custom Modeling
+	The elevator moves to the exact same position as the exits they move to, you can either model the elevator in a way that matches this, or you can set an empty game object as the exit point or whatever methods you're happiest with.
+	The "Basic Elevator" prefab uses a reflection probe (custom baking for easier implementation) that moves with it to get it's aesthetic.
+		Not really an important feature, it's just if you want to imitate it.
+	Your elevator model must contain at least 1 collider set to "trigger" for the smooth movement to work.
+
+
+Want your buttons to be more immersive in VR? Just drag in the "VR finger press" prefab. That's it. It will do the rest!
+	It works on the left and the right hand, on any avatars that use at least 2 finger digits, which is most of them!
+
+Have any issues? Report them to the discord! discord.gg/vNTNgzPJPf
