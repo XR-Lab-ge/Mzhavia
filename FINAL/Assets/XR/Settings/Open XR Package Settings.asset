@@ -952,7 +952,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   features:
   - {fileID: 8221564594354640495}
-  - {fileID: -1557233674024107270}
+  - {fileID: -8749980634715080836}
   - {fileID: 9096479736163431129}
   - {fileID: -6872868469741455986}
   - {fileID: 5047315830286589360}
@@ -966,7 +966,7 @@ MonoBehaviour:
   - {fileID: 6841333374066517713}
   - {fileID: -4454024988132797082}
   - {fileID: 8696673654983134887}
-  - {fileID: 4451366187881382638}
+  - {fileID: -4731438336562001402}
   - {fileID: 4135229692886101830}
   - {fileID: 2220871646205782247}
   - {fileID: 239522605376452086}
@@ -2466,7 +2466,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b862ee14fb479fbfe5fffe655d3ed3, type: 3}
   m_Name: MetaQuestTouchProControllerProfile Android
   m_EditorClassIdentifier: 
-  m_enabled: 0
+  m_enabled: 1
   nameUi: Meta Quest Touch Pro Controller Profile
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.metaquestpro
